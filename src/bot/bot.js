@@ -78,7 +78,7 @@ export const setup = async (discordToken, clientId) => {
                 commandsToAdd.push(command);
             }
             try {
-                await rest.put(Routes.applicationGuildCommands(clientId, id), { body: jsonCommands });
+                await rest.put(Routes.applicationGuildCommands(clientId, id), { body: commandsToAdd });
             } catch (error) {
                 console.error(`Unable to register commands for ${guild.name}:`);
                 console.error(error);
