@@ -14,6 +14,7 @@ export const setup = async (discordToken, clientId) => {
     intents.add(discord.Intents.FLAGS.GUILDS);
     intents.add(discord.Intents.FLAGS.GUILD_MESSAGES);
     intents.add(discord.Intents.FLAGS.DIRECT_MESSAGES);
+
     discordClient = new discord.Client({ intents });
 
     discordClient.on('interactionCreate', async (interaction) => {
@@ -38,7 +39,11 @@ export const setup = async (discordToken, clientId) => {
         }, 200);
     });
 
-    //discordClient.on('message', (msg) => {});
+    discordClient.on('message', async function (message) {
+        const emoji = '729304124608348200';
+        if (message.author.id !== '560763794029019157') return;
+        await msg.react(emoji);
+    });
 
     await discordClient.login(discordToken);
 
