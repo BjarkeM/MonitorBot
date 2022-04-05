@@ -1,0 +1,10 @@
+version: '3'
+services:
+  monitorbot:
+    restart: unless-stopped
+    image: node:16.14-alpine
+    command: ["/app/run.sh"]
+    working_dir: /app
+    volumes:
+      - ./:/app:z
+    hostname: monitorbot
