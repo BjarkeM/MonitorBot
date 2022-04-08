@@ -71,7 +71,7 @@ export const setup = async (discordToken, clientId) => {
     try {
         const guilds = await discordClient.guilds.fetch();
         for (const [id, guild] of guilds) {
-            console.log(`Registering monitorbot (/) commands for ${guild.name}.`);
+            console.log(`Registering monitorbot (/) commands for ${guild.name} (${id}).`);
             const commandsToAdd = [];
 
             for (const command of jsonCommands) {

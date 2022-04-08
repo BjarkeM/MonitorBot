@@ -49,7 +49,7 @@ async function updateRole(interaction) {
             }
             updatedRoles.push(role.name);
         } catch (error) {
-            console.error(`Unable to ${action} role "${role.name}" ${to_from} ${user.tag}:`);
+            console.log(`Unable to ${action} role "${role.name}" ${to_from} ${user.tag}:`);
             console.error(error);
             roleError = true;
             continue;
