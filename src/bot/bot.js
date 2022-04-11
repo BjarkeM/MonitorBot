@@ -2,9 +2,47 @@ import * as discord from 'discord.js';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import * as fs from 'fs';
+import fetch from 'node-fetch';
 
 export let discordClient = undefined;
 export const commands = new discord.Collection();
+
+async function onMessage(message) {
+    if (message.author.id === '560763794029019157') {
+        const emoji = '729304124608348200';
+        await msg.react(emoji);
+    }
+
+    if (message.author.tag !== 'Klex#3053') return;
+    const content = message.content;
+
+    const informChannel = discordClient.channels._cache.get('963116330372964392');
+    if (message.guild.id !== informChannel.guild.id) return;
+
+    // do some checking of URL contents and report if it's a file URL
+    try {
+        const monsterUrlRegex =
+            /(((http|https|Http|Https|rtsp|Rtsp):\/\/(?:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,64}(?:\:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,25})?\@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\:\d{1,5})?)(\/(?:(?:[a-zA-Z0-9\;\/\?\:\@\&\=\#\~\-\.\+\!\*\'\(\)\,\_])|(?:\%[a-fA-F0-9]{2}))*)?(?:\b|$)/gi;
+        const matches = content.match(monsterUrlRegex);
+        if (matches) {
+            for (const match of matches) {
+                try {
+                    const response = await fetch(match, { method: 'HEAD' });
+                    const contentHeader = response.headers.get('Content-Disposition');
+                    let name = contentHeader.split('filename=');
+                    if (name.length) name = name[name.length - 1];
+                    const infoMessage = `posted file link \`${match}\` in message ${message.url}`;
+                    console.log(`${message.author.tag} ${infoMessage}`);
+                    await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
+                } catch (error) {
+                    // don't do anything
+                }
+            }
+        }
+    } catch (error) {
+        return;
+    }
+}
 
 export const setup = async (discordToken, clientId) => {
     if (!discordToken) {
@@ -39,11 +77,7 @@ export const setup = async (discordToken, clientId) => {
         }, 200);
     });
 
-    discordClient.on('message', async function (message) {
-        const emoji = '729304124608348200';
-        if (message.author.id !== '560763794029019157') return;
-        await msg.react(emoji);
-    });
+    discordClient.on('message', onMessage);
 
     await discordClient.login(discordToken);
 
