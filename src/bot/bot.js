@@ -14,6 +14,8 @@ async function onMessage(message) {
     }
     const content = message.content;
 
+    if (message.author.bot) return;
+
     const informChannel = discordClient.channels._cache.get('963116330372964392');
     if (message.guild.id !== informChannel.guild.id) return;
 
