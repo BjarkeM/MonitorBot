@@ -27,8 +27,14 @@ async function onMessage(message) {
                 try {
                     const response = await fetch(match, { method: 'HEAD' });
                     const contentHeader = response.headers.get('Content-Disposition');
-                    let name = contentHeader.split('filename=');
-                    if (name.length > 1) {
+                    let is_download = false;
+                    if (contentHeader != null) {
+                        const name = contentHeader.split('filename=');
+                        is_download = name.length > 1;
+                    } else {
+                        is_download = response.headers.get('Content-Type')?.toLowerCase() == 'application/octet-stream';
+                    }
+                    if (is_download) {
                         const infoMessage = `posted file link \`${match}\` in message ${message.url}`;
                         console.log(`${message.author.tag} ${infoMessage}`);
                         await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
