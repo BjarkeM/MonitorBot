@@ -12,8 +12,6 @@ async function onMessage(message) {
         const emoji = '729304124608348200';
         await msg.react(emoji);
     }
-
-    if (message.author.tag !== 'Klex#3053') return;
     const content = message.content;
 
     const informChannel = discordClient.channels._cache.get('963116330372964392');
@@ -30,10 +28,11 @@ async function onMessage(message) {
                     const response = await fetch(match, { method: 'HEAD' });
                     const contentHeader = response.headers.get('Content-Disposition');
                     let name = contentHeader.split('filename=');
-                    if (name.length) name = name[name.length - 1];
-                    const infoMessage = `posted file link \`${match}\` in message ${message.url}`;
-                    console.log(`${message.author.tag} ${infoMessage}`);
-                    await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
+                    if (name.length > 1) {
+                        const infoMessage = `posted file link \`${match}\` in message ${message.url}`;
+                        console.log(`${message.author.tag} ${infoMessage}`);
+                        await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
+                    }
                 } catch (error) {
                     // don't do anything
                 }
