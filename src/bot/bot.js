@@ -17,7 +17,7 @@ async function onMessage(message) {
     if (message.author.bot) return;
 
     const informChannel = discordClient.channels._cache.get('963116330372964392');
-    //if (message.guild.id !== informChannel.guild.id) return;
+    if (message.guild.id !== informChannel.guild.id) return;
 
     // do some checking of URL contents and report if it's a file URL
     try {
@@ -53,7 +53,7 @@ async function onMessage(message) {
                     if (is_download) {
                         const infoMessage = `posted file link \`${match}\` in message ${message.url}`;
                         console.log(`${message.author.tag} ${infoMessage}`);
-                        //await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
+                        await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
                     }
                 } catch (error) {
                     // don't do anything
