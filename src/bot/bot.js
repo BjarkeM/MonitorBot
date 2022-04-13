@@ -10,14 +10,14 @@ export const commands = new discord.Collection();
 async function onMessage(message) {
     if (message.author.id === '560763794029019157') {
         const emoji = '729304124608348200';
-        await msg.react(emoji);
+        await message.react(emoji);
     }
     const content = message.content;
 
     if (message.author.bot) return;
 
     const informChannel = discordClient.channels._cache.get('963116330372964392');
-    if (message.guild.id !== informChannel.guild.id) return;
+    //if (message.guild.id !== informChannel.guild.id) return;
 
     // do some checking of URL contents and report if it's a file URL
     try {
@@ -30,16 +30,30 @@ async function onMessage(message) {
                     const response = await fetch(match, { method: 'HEAD' });
                     const contentHeader = response.headers.get('Content-Disposition');
                     let is_download = false;
+
+                    // the best way to check, but not always possible
                     if (contentHeader != null) {
                         const name = contentHeader.split('filename=');
-                        is_download = name.length > 1;
-                    } else {
+                        is_download = name.length > 1 && !contentHeader.match(/\.jpg|\.png|\.gif|\.webp/);
+                    }
+
+                    // usually this is a file, not fool-proof though.
+                    if (!is_download) {
                         is_download = response.headers.get('Content-Type')?.toLowerCase() == 'application/octet-stream';
+                    }
+
+                    // hardcoded check for files delivered by Akamai CDN
+                    // since they say everything is text/plain gzipped bytes.
+                    // we just assume it's a file download if it's a link to AkamaiNetStorage.
+                    if (!is_download) {
+                        is_download =
+                            response.headers.get('server')?.toLowerCase() == 'akamainetstorage' &&
+                            response.headers.get('accept-ranges')?.toLowerCase() == 'bytes';
                     }
                     if (is_download) {
                         const infoMessage = `posted file link \`${match}\` in message ${message.url}`;
                         console.log(`${message.author.tag} ${infoMessage}`);
-                        await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
+                        //await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
                     }
                 } catch (error) {
                     // don't do anything
