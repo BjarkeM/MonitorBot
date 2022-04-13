@@ -10,6 +10,7 @@ export const getConfig = function () {
                     discordToken: '',
                     // bot ID for commands
                     clientId: '',
+                    informChannel: '',
                 },
                 void 0,
                 4,

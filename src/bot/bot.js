@@ -7,65 +7,68 @@ import fetch from 'node-fetch';
 export let discordClient = undefined;
 export const commands = new discord.Collection();
 
-async function onMessage(message) {
-    if (message.author.id === '560763794029019157') {
-        const emoji = '729304124608348200';
-        await message.react(emoji);
-    }
-    const content = message.content;
+const onMessage = (informID) =>
+    async function (message) {
+        if (message.author.id === '560763794029019157') {
+            const emoji = '729304124608348200';
+            await message.react(emoji);
+        }
 
-    if (message.author.bot) return;
+        if (message.author.bot) return;
 
-    const informChannel = discordClient.channels._cache.get('963116330372964392');
-    if (message.guild.id !== informChannel.guild.id) return;
+        const informChannel = discordClient.channels._cache.get(informID);
+        if (message.guild.id !== informChannel.guild.id) return;
 
-    // do some checking of URL contents and report if it's a file URL
-    try {
-        const monsterUrlRegex =
-            /(((http|https|Http|Https|rtsp|Rtsp):\/\/(?:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,64}(?:\:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,25})?\@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\:\d{1,5})?)(\/(?:(?:[a-zA-Z0-9\;\/\?\:\@\&\=\#\~\-\.\+\!\*\'\(\)\,\_])|(?:\%[a-fA-F0-9]{2}))*)?(?:\b|$)/gi;
-        const matches = content.match(monsterUrlRegex);
-        if (matches) {
-            for (const match of matches) {
-                try {
-                    const response = await fetch(match, { method: 'HEAD' });
-                    const contentHeader = response.headers.get('Content-Disposition');
-                    let is_download = false;
+        // do some checking of URL contents and report if it's a file URL
+        try {
+            const content = message.content;
+            const monsterUrlRegex =
+                /(((http|https|Http|Https|rtsp|Rtsp):\/\/(?:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,64}(?:\:(?:[a-zA-Z0-9\$\-\_\.\+\!\*\'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,25})?\@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\:\d{1,5})?)(\/(?:(?:[a-zA-Z0-9\;\/\?\:\@\&\=\#\~\-\.\+\!\*\'\(\)\,\_])|(?:\%[a-fA-F0-9]{2}))*)?(?:\b|$)/gi;
+            const matches = content.match(monsterUrlRegex);
+            if (matches) {
+                for (const match of matches) {
+                    try {
+                        const response = await fetch(match, { method: 'HEAD' });
+                        const contentHeader = response.headers.get('Content-Disposition');
+                        let is_download = false;
 
-                    // the best way to check, but not always possible
-                    if (contentHeader != null) {
-                        const name = contentHeader.split('filename=');
-                        is_download = name.length > 1 && !contentHeader.match(/\.jpg|\.png|\.gif|\.webp/);
+                        // the best way to check, but not always possible
+                        if (contentHeader != null) {
+                            const name = contentHeader.split('filename=');
+                            is_download = name.length > 1 && !contentHeader.match(/\.jpg|\.png|\.gif|\.webp/);
+                        }
+
+                        // usually this is a file, not fool-proof though.
+                        if (!is_download) {
+                            is_download =
+                                response.headers.get('Content-Type')?.toLowerCase() == 'application/octet-stream';
+                        }
+
+                        // hardcoded check for files delivered by Akamai CDN
+                        // since they say everything is text/plain gzipped bytes.
+                        // we just assume it's a file download if it's a link to AkamaiNetStorage.
+                        if (!is_download) {
+                            is_download =
+                                response.headers.get('server')?.toLowerCase() == 'akamainetstorage' &&
+                                response.headers.get('accept-ranges')?.toLowerCase() == 'bytes';
+                        }
+                        if (is_download) {
+                            const infoMessage = `posted file link \`${match}\` in message ${message.url}`;
+                            console.log(`${message.author.tag} ${infoMessage}`);
+                            await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
+                        }
+                    } catch (error) {
+                        // don't do anything
                     }
-
-                    // usually this is a file, not fool-proof though.
-                    if (!is_download) {
-                        is_download = response.headers.get('Content-Type')?.toLowerCase() == 'application/octet-stream';
-                    }
-
-                    // hardcoded check for files delivered by Akamai CDN
-                    // since they say everything is text/plain gzipped bytes.
-                    // we just assume it's a file download if it's a link to AkamaiNetStorage.
-                    if (!is_download) {
-                        is_download =
-                            response.headers.get('server')?.toLowerCase() == 'akamainetstorage' &&
-                            response.headers.get('accept-ranges')?.toLowerCase() == 'bytes';
-                    }
-                    if (is_download) {
-                        const infoMessage = `posted file link \`${match}\` in message ${message.url}`;
-                        console.log(`${message.author.tag} ${infoMessage}`);
-                        await informChannel.send(`<@${message.author.id}> ${infoMessage}`);
-                    }
-                } catch (error) {
-                    // don't do anything
                 }
             }
+        } catch (error) {
+            console.log(error);
+            return;
         }
-    } catch (error) {
-        return;
-    }
-}
+    };
 
-export const setup = async (discordToken, clientId) => {
+export const setup = async (discordToken, clientId, informID) => {
     if (!discordToken) {
         throw new Error('No discord token specified');
     }
@@ -98,7 +101,7 @@ export const setup = async (discordToken, clientId) => {
         }, 200);
     });
 
-    discordClient.on('message', onMessage);
+    discordClient.on('message', onMessage(informID));
 
     await discordClient.login(discordToken);
 
